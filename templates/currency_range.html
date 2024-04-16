@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="currency-range-container">
+    <form method="POST" action="{{ url_for('currency_range') }}" class="currency-range-form">
+        <div class="form-field">
+            <label for="currency_code">Currency Code:</label>
+            <select id="currency_code" name="currency_code" class="form-control">
+                {% for code in currency_codes %}
+                <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code.upper() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" required value="{{ start_date }}" min="2024-03-06" max="2024-04-16">
+        </div>
+        <div class="form-field">
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" required value="{{ end_date }}" min="2024-03-06" max="2024-04-16">
+        </div>
+        <div class="form-field">
+            <button type="submit" class="form-control btn-search">Search</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-responsive">
+    <table id="currencyTable" class="display" style="width:100%;">
+        <thead>
+            <tr>
+                <th>Currency Code</th>
+                <th>Date</th>
+                <th>Exchange Rate for 1 USD</th>
+                <th>Exchange Rate for 1 EUR</th>
+                <th>Exchange Rate for 1 JPY</th>
+                <th>Exchange Rate for 1 CAD</th>
+                <th>Exchange Rate for 1 BTC</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in data %}
+            <tr>
+                <td>{{ record['currency_code'] }}</td>
+                <td>{{ record['exchange_date'] }}</td>
+                <td>{{ record['exchange_rate_usd'] }}</td>
+                <td>{{ record['exchange_rate_eur'] }}</td>
+                <td>{{ record['exchange_rate_jpy'] }}</td>
+                <td>{{ record['exchange_rate_cad'] }}</td>
+                <td>{{ record['exchange_rate_btc'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .currency-range-container {
+        margin: 20px 0;
+    }
+    .currency-range-form {
+        display: flex;
+        flex-direction: column; /* Stack fields vertically */
+        gap: 20px; /* Increased space between form fields */
+        margin-bottom: 20px;
+    }
+    .form-field {
+        margin-bottom: 20px; /* Increased space between form fields */
+    }
+    .form-control {
+        width: 100%; /* Full width */
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        line-height: 1.5;
+        font-size: 1rem;
+    }
+    .form-control:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .btn-search {
+        color: #fff;
+        background-color: #008080;
+        border-color: #006666;
+        transition: background-color 0.3s ease;
+    }
+    .btn-search:hover {
+        color: #fff;
+        background-color: #006666;
+        border-color: #006666;
+    }
+    /* Responsive layout for smaller screens */
+    @media (max-width: 768px) {
+        .currency-range-form {
+            flex-direction: column;
+        }
+    }
+</style>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#currencyTable').DataTable({
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "searching": true
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="table-responsive">
+    <table id="currencyTable" class="display">
+        <thead>
+            <tr>
+                <th>Currency Code</th>
+                <th>Currency Name</th>
+                <th>Exchange Rate for 1 USD</th>
+                <th>Exchange Rate for 1 EUR</th>
+                <th>Exchange Rate for 1 CAD</th>
+                <th>Exchange Rate for 1 JPY</th>
+                <th>Exchange Rate for 1 BTC</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for currency in currencies %}
+            <tr>
+                <td>{{ currency.currency_code }}</td>
+                <td>{{ currency.currency_name }}</td>
+                <td>{{ currency.exchange_rate_usd }}</td>
+                <td>{{ currency.exchange_rate_eur }}</td>
+                <td>{{ currency.exchange_rate_cad }}</td>
+                <td>{{ currency.exchange_rate_jpy }}</td>
+                <td>{{ currency.exchange_rate_btc }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#currencyTable').DataTable({
+            "paging": true,
+            "ordering": true,
+            "info": true,
+            "searching": true
+        });
+    });
+</script>
+{% endblock %}

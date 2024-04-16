@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="currency-range-container">
+    <form method="POST" action="{{ url_for('dashboard') }}" class="currency-range-form">
+        <div class="form-field">
+            <label for="currency_code">Currency Code:</label>
+            <select id="currency_code" name="currency_code" class="form-control">
+                {% for code in currency_codes %}
+                <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>
+                    {{ code.upper() }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" class="form-control" required value="{{ start_date }}" min="2024-03-06" max="2024-04-16">
+        </div>
+        <div class="form-field">
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" class="form-control" required value="{{ end_date }}" min="2024-03-06" max="2024-04-16">
+        </div>
+        <div class="form-field">
+        <button type="submit" class="form-control btn-search">Search</button>
+    </div>
+    </form>
+    <div class="form-field">
+        <label for="currency-selector">Select Exchange Currency:</label>
+        <select id="currency-selector" class="form-control" onchange="drawChart()">
+            <option value="usd">USD</option>
+            <option value="cad">CAD</option>
+            <option value="btc">BTC</option>
+            <option value="jpy">JPY</option>
+            <option value="eur">EUR</option>
+        </select>
+    </div>
+</div>
+
+<style>
+    .currency-range-container {
+        margin: 20px;
+    }
+    .currency-range-form {
+        display: flex;
+        flex-direction: row; /* Align fields horizontally */
+        align-items: center; /* Align items vertically in the center */
+        gap: 10px; /* Space between form fields */
+    }
+    .form-field {
+        flex-grow: 1; /* Allows each field to grow as needed */
+    }
+    .form-field:not(:last-child) { /* Add margin to all fields except the last one */
+        margin-right: 20px; /* Space between fields */
+    }
+    .form-field:last-child { /* Add margin to all fields except the last one */
+        margin-top: 20px; /* Space between fields */
+    }
+    .form-control {
+        width: 100%; /* Full width within its container */
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        line-height: 1.5;
+        font-size: 1rem;
+    }
+    .btn-search {
+        white-space: nowrap; /* Prevents wrapping of text in the button */
+        color: #fff;
+        background-color: #008080;
+        border-color: #006666;
+    }
+    .btn-search:hover {
+        background-color: #006666;
+    }
+    @media (max-width: 768px) {
+        .currency-range-form {
+            flex-direction: column; /* Stacks fields vertically on smaller screens */
+            gap: 15px; /* Adjust gap for smaller screens */
+        }
+        .form-field:not(:last-child) {
+            margin-right: 0; /* Remove the margin in mobile view */
+        }
+    }
+</style>
+
+<div id="exchange_rate_chart" style="width: 100%; height: 500px;"></div>
+
+<script type="text/javascript">
+    var exchangeData = {{ data|tojson|safe }};
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var selectedCurrency = document.getElementById('currency-selector').value;
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Date');
+        data.addColumn('number', selectedCurrency.toUpperCase());
+
+        var rows = exchangeData.map(function(record) {
+            return [
+                record.exchange_date,
+                parseFloat(record['exchange_rate_' + selectedCurrency])
+            ];
+        });
+
+        data.addRows(rows);
+
+        var options = {
+            title: selectedCurrency.toUpperCase() + ' Exchange Rate Over Time',
+            curveType: 'function',
+            legend: { position: 'bottom' },
+            hAxis: { title: 'Date' },
+            vAxis: { title: 'Exchange Rate' },
+            colors: ['#007bff'] // Example color, change as needed
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('exchange_rate_chart'));
+        chart.draw(data, options);
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}

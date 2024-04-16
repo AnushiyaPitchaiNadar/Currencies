@@ -1,0 +1,132 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #ECF0F1;
+        }
+        .sidebar {
+            height: 100%;
+            width: 250px; /* Sidebar width */
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #006666; /* Dark Cyan */
+            overflow-x: hidden;
+            padding-top: 20px;
+            transition: 0.5s;
+        }
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+        }
+        .sidebar a:hover {
+            background-color: #004c4c; /* Darker Cyan */
+        }
+        .main {
+            transition: margin-left .5s;
+            padding: 20px;
+            margin-left: 250px; /* Same as the sidebar width */
+            overflow: hidden;
+        }
+        .openbtn {
+            font-size: 20px;
+            cursor: pointer;
+            background-color: #006666; /* Dark Cyan */
+            color: white;
+            border: none;
+            position: fixed;
+            top: 20px;
+            left: 10px;
+            width: 35px;
+            height: 35px;
+            text-align: center;
+            line-height: 35px;
+            border-radius: 5px;
+            transition: margin-left .5s;
+        }
+        .title {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            color: #006666; /* Dark Cyan */
+        }
+        th {
+            background-color: #008080; /* Teal color */
+            color: white;
+            padding: 12px 8px;
+        }
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1em;
+        }
+        .dataTables_wrapper .dataTables_paginate {
+            margin-top: 1em;
+        }
+
+        /* Styles for table cells */
+        table.dataTable tbody td {
+            text-align: center; /* Center text */
+            vertical-align: middle; /* Middle align text */
+        }
+
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                left: 0;
+            }
+            .openbtn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+            }
+            .main {
+                margin-left: 0;
+            }
+        }
+    </style>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" onclick="closeNav()">×</a>
+        <a href="/">Dashboard</a>
+        <a href="/currencies">All Currencies</a>
+        <a href="/range">Exchange Rates for a Range</a>
+    </div>
+
+    <div class="main">
+        <button class="openbtn" onclick="openNav()">☰</button>
+        <div class="title">{{ title }}</div>
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        function openNav() {
+            document.getElementById("mySidebar").style.width = "250px";
+            document.getElementsByClassName("main")[0].style.marginLeft = "250px";
+        }
+
+        function closeNav() {
+            document.getElementById("mySidebar").style.width = "0";
+            document.getElementsByClassName("main")[0].style.marginLeft= "0";
+        }
+    </script>
+
+</body>
+</html>

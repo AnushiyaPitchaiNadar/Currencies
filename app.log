@@ -1,0 +1,19 @@
+2024-04-16 16:23:03,785 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2024-04-16 16:23:03,786 - INFO - Added job "copy_currencies_to_history" to job store "default"
+2024-04-16 16:23:03,786 - INFO - Scheduler started
+2024-04-16 16:23:03,796 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-04-16 16:23:03,796 - INFO - [33mPress CTRL+C to quit[0m
+2024-04-16 16:23:21,969 - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2024-04-16 16:23:21,970 - INFO - Added job "copy_currencies_to_history" to job store "default"
+2024-04-16 16:23:21,971 - INFO - Scheduler started
+2024-04-16 16:23:21,979 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-04-16 16:23:21,979 - INFO - [33mPress CTRL+C to quit[0m
+2024-04-16 16:24:00,014 - INFO - Running job "copy_currencies_to_history (trigger: cron[hour='16', minute='24'], next run at: 2024-04-16 16:24:00 EDT)" (scheduled at 2024-04-16 16:24:00-04:00)
+2024-04-16 16:24:00,016 - INFO - Job started - Coping data from currencies to currencies history
+2024-04-16 16:24:00,633 - INFO - 127.0.0.1 - - [16/Apr/2024 16:24:00] "POST / HTTP/1.1" 200 -
+2024-04-16 16:24:09,058 - INFO - 127.0.0.1 - - [16/Apr/2024 16:24:09] "POST /update-currencies HTTP/1.1" 200 -
+2024-04-16 16:24:09,061 - INFO - Job completed - Copied data from currencies to currencies history
+2024-04-16 16:24:09,062 - INFO - Job "copy_currencies_to_history (trigger: cron[hour='16', minute='24'], next run at: 2024-04-17 16:24:00 EDT)" executed successfully
+2024-04-16 16:24:14,556 - INFO - 127.0.0.1 - - [16/Apr/2024 16:24:14] "POST / HTTP/1.1" 200 -
