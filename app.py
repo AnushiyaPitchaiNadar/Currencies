@@ -210,6 +210,37 @@ def currency_range():
                            selected_currency=selected_currency, start_date=start_date, end_date=end_date)
 
 
+@app.route('/calculate_rate', methods=['GET', 'POST'])
+def calculate_rate():
+    currency_codes = ['usd', 'eur', 'btc', 'jpy', 'cad', 'inr', 'sgd', 'chf', 'krw', 'gbp']
+
+    selected_currency = request.form.get('currency_code', 'cad')
+    amount = request.form.get('amount', 1000)
+
+    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                    SELECT currency_code, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                           exchange_rate_cad, exchange_rate_btc
+                    FROM currencies
+                    WHERE currency_code = %s
+                """, (selected_currency,))
+            rate = cur.fetchone()
+            calculated_rates = {}
+            if rate:
+                calculated_rates = {
+                    'eur': float(amount) / float(rate['exchange_rate_eur']),
+                    'btc': float(amount) / float(rate['exchange_rate_btc']),
+                    'cad': float(amount) / float(rate['exchange_rate_cad']),
+                    'usd': float(amount) / float(rate['exchange_rate_usd']),
+                    'jpy': float(amount) / float(rate['exchange_rate_jpy']),
+                }
+    finally:
+        conn.close()
+    return render_template('calculate_rate.html', title="Calculate Exchange Rate", data=calculated_rates,
+                           selected_currency=selected_currency, amount=amount, currency_codes=currency_codes)
+
 def copy_currencies_to_history():
     logging.info("Job started - Coping data from currencies to currencies history")
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)

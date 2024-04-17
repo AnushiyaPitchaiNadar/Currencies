@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="currency-range-container">
+    <form method="POST" action="{{ url_for('calculate_rate') }}" class="currency-range-form">
+        <div class="form-field">
+            <label for="currency_code">Currency Code:</label>
+            <select id="currency_code" name="currency_code" class="form-control">
+                {% for code in currency_codes %}
+                <option value="{{ code }}" {% if code == selected_currency %}selected{% endif %}>{{ code.upper() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-field">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" class="form-control" required value="{{ amount }}">
+        </div>
+        <div class="form-field">
+            <button type="submit" class="form-control btn-calculate">Calculate</button>
+        </div>
+    </form>
+</div>
+
+{% if data %}
+<div class="currency-calculation-results">
+    <h2>Exchange Rates:</h2>
+    <p>EUR: {{ data['eur'] | round(4) }}</p>
+    <p>BTC: {{ data['btc'] | round(8) }}</p>
+    <p>CAD: {{ data['cad'] | round(4) }}</p>
+    <p>USD: {{ data['usd'] | round(4) }}</p>
+    <p>JPY: {{ data['jpy'] | round(2) }}</p>
+</div>
+{% endif %}
+
+<style>
+    .currency-range-container {
+        margin: 20px 0;
+    }
+    .currency-range-form {
+        display: flex;
+        flex-direction: column; /* Stack fields vertically */
+        gap: 20px; /* Increased space between form fields */
+        margin-bottom: 20px;
+    }
+    .form-field {
+        margin-bottom: 20px; /* Increased space between form fields */
+    }
+    .form-control {
+        width: 100%; /* Full width */
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        line-height: 1.5;
+        font-size: 1rem;
+    }
+    .form-control:focus {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .btn-calculate {
+        color: #fff;
+        background-color: #008080;
+        border-color: #006666;
+        transition: background-color 0.3s ease;
+    }
+    .btn-calculate:hover {
+        color: #fff;
+        background-color: #006666;
+        border-color: #006666;
+    }
+    .currency-calculation-results {
+        margin-top: 20px;
+        background-color: #f7f7f7;
+        padding: 15px;
+        border-radius: 5px;
+    }
+    .currency-calculation-results h2 {
+        margin-bottom: 10px;
+    }
+    /* Responsive layout for smaller screens */
+    @media (max-width: 768px) {
+        .currency-range-form {
+            flex-direction: column;
+        }
+    }
+</style>
+
+{% endblock %}
