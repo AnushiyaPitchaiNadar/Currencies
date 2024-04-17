@@ -251,7 +251,7 @@ def copy_currencies_to_history():
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=copy_currencies_to_history, trigger='cron', hour=14, minute=30)
+scheduler.add_job(func=copy_currencies_to_history, trigger='cron', hour=18, minute=40)
 scheduler.start()
 
 if __name__ == '__main__':
