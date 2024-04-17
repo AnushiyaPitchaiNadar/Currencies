@@ -245,7 +245,7 @@ def copy_currencies_to_history():
     conn.close()
 
     # Trigger the /update-currencies endpoint
-    requests.post('http://127.0.0.1:5000//update-currencies')
+    requests.post('http://127.0.0.1:5000/update-currencies')
 
     logging.info("Job completed - Copied data from currencies to currencies history")
 
