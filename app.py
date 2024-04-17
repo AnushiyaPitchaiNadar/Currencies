@@ -244,14 +244,14 @@ def copy_currencies_to_history():
     cur.close()
     conn.close()
 
-    # Updating the currencies
-    update_currencies()
+    # Trigger the /update-currencies endpoint
+    requests.post('http://127.0.0.1:5000//update-currencies')
 
     logging.info("Job completed - Copied data from currencies to currencies history")
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=copy_currencies_to_history, trigger='cron', hour=19, minute=00)
+scheduler.add_job(func=copy_currencies_to_history, trigger='cron', hour=19, minute=10)
 scheduler.start()
 
 if __name__ == '__main__':
