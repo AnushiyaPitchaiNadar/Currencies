@@ -15,11 +15,11 @@
         </div>
         <div class="form-field">
             <label for="start_date">Start Date:</label>
-            <input type="date" id="start_date" name="start_date" class="form-control" required value="{{ start_date }}" min="2024-03-06" max="2024-04-16">
+            <input type="date" id="start_date" name="start_date" class="form-control" required value="{{ start_date }}" min="2024-03-06" max="<?= date('Y-m-d'); ?>">
         </div>
         <div class="form-field">
             <label for="end_date">End Date:</label>
-            <input type="date" id="end_date" name="end_date" class="form-control" required value="{{ end_date }}" min="2024-03-06" max="2024-04-16">
+            <input type="date" id="end_date" name="end_date" class="form-control" required value="{{ end_date }}" min="2024-03-06" max="<?= date('Y-m-d'); ?>">
         </div>
         <div class="form-field">
         <button type="submit" class="form-control btn-search">Search</button>
@@ -94,9 +94,10 @@
 
     function drawChart() {
         var selectedCurrency = document.getElementById('currency-selector').value;
+        var currencyCode = document.getElementById('currency_code').value;
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'Date');
-        data.addColumn('number', selectedCurrency.toUpperCase());
+        data.addColumn('number', currencyCode.toUpperCase());
 
         var rows = exchangeData.map(function(record) {
             return [
@@ -112,7 +113,7 @@
             curveType: 'function',
             legend: { position: 'bottom' },
             hAxis: { title: 'Date' },
-            vAxis: { title: 'Exchange Rate' },
+            vAxis: { title: 'Exchange Rate in ' + currencyCode.toUpperCase() },
             colors: ['#007bff'] // Example color, change as needed
         };
 

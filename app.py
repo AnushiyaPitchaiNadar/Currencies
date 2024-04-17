@@ -124,11 +124,12 @@ def update_currencies_history():
 
     return jsonify({'message': 'Currencies history updated successfully'}), 200
 
-@app.route('/', methods=['GET', 'POST'])  # Handle both GET and POST
+@app.route('/', methods=['GET', 'POST'])
 def dashboard():
     currency_codes = ['usd', 'eur', 'btc', 'jpy', 'cad', 'inr', 'sgd', 'chf', 'krw', 'gbp']
     default_start_date = '2024-03-06'
-    default_end_date = '2024-04-16'
+    today_date = datetime.date.today().strftime("%Y-%m-%d")
+    default_end_date = today_date
 
     if request.method == 'POST':
         selected_currency = request.form.get('currency_code', 'cad')
@@ -143,12 +144,17 @@ def dashboard():
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
-                    SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
-                           exchange_rate_cad, exchange_rate_btc
-                    FROM currencies_history
-                    WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
-                    ORDER BY exchange_date ASC
-                """, (selected_currency, start_date, end_date))
+                SELECT currency_code, %s as exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                       exchange_rate_cad, exchange_rate_btc
+                FROM currencies
+                WHERE currency_code = %s
+                UNION
+                SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                       exchange_rate_cad, exchange_rate_btc
+                FROM currencies_history
+                WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
+                ORDER BY exchange_date ASC
+            """, (today_date, selected_currency, selected_currency, start_date, end_date))
             data = cur.fetchall()
     finally:
         conn.close()
@@ -175,7 +181,8 @@ def all_currencies():
 def currency_range():
     currency_codes = ['usd', 'eur', 'btc', 'jpy', 'cad', 'inr', 'sgd', 'chf', 'krw', 'gbp']
     default_start_date = '2024-03-06'
-    default_end_date = '2024-04-16'
+    today_date = datetime.date.today().strftime("%Y-%m-%d")
+    default_end_date = today_date
 
     selected_currency = request.form.get('currency_code', 'cad')
     start_date = request.form.get('start_date', default_start_date)
@@ -185,16 +192,21 @@ def currency_range():
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
+                SELECT currency_code, %s as exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                       exchange_rate_cad, exchange_rate_btc
+                FROM currencies
+                WHERE currency_code = %s
+                UNION
                 SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
                        exchange_rate_cad, exchange_rate_btc
                 FROM currencies_history
                 WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
-                ORDER BY exchange_date ASC
-            """, (selected_currency, start_date, end_date))
+                ORDER BY exchange_date DESC
+            """, (today_date, selected_currency, selected_currency, start_date, end_date))
             data = cur.fetchall()
     finally:
         conn.close()
-    return render_template('currency_range.html', currency_codes=currency_codes, data=data,
+    return render_template('currency_range.html', title = "Exchange rate over a period of time", currency_codes=currency_codes, data=data,
                            selected_currency=selected_currency, start_date=start_date, end_date=end_date)
 
 
@@ -228,18 +240,18 @@ def copy_currencies_to_history():
     """)
     conn.commit()
 
-    # Trigger the /update-currencies endpoint
-    requests.post('http://localhost:5000/update-currencies')
-
     # Close the connection
     cur.close()
     conn.close()
+
+    # Updating the currencies
+    update_currencies()
 
     logging.info("Job completed - Copied data from currencies to currencies history")
 
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=copy_currencies_to_history, trigger='cron', hour=16, minute=24)
+scheduler.add_job(func=copy_currencies_to_history, trigger='cron', hour=14, minute=30)
 scheduler.start()
 
 if __name__ == '__main__':
