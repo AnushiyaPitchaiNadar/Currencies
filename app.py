@@ -143,18 +143,27 @@ def dashboard():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("""
-                SELECT currency_code, %s as exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
-                       exchange_rate_cad, exchange_rate_btc
-                FROM currencies
-                WHERE currency_code = %s
-                UNION
-                SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
-                       exchange_rate_cad, exchange_rate_btc
-                FROM currencies_history
-                WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
-                ORDER BY exchange_date ASC
-            """, (today_date, selected_currency, selected_currency, start_date, end_date))
+            if today_date > end_date:
+                cur.execute("""
+                                SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                                       exchange_rate_cad, exchange_rate_btc
+                                FROM currencies_history
+                                WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
+                                ORDER BY exchange_date ASC
+                            """, (selected_currency, start_date, end_date))
+            else:
+                cur.execute("""
+                                SELECT currency_code, %s as exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                                       exchange_rate_cad, exchange_rate_btc
+                                FROM currencies
+                                WHERE currency_code = %s
+                                UNION
+                                SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                                       exchange_rate_cad, exchange_rate_btc
+                                FROM currencies_history
+                                WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
+                                ORDER BY exchange_date ASC
+                            """, (today_date, selected_currency, selected_currency, start_date, end_date))
             data = cur.fetchall()
     finally:
         conn.close()
@@ -191,18 +200,27 @@ def currency_range():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST)
     try:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("""
-                SELECT currency_code, %s as exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
-                       exchange_rate_cad, exchange_rate_btc
-                FROM currencies
-                WHERE currency_code = %s
-                UNION
-                SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
-                       exchange_rate_cad, exchange_rate_btc
-                FROM currencies_history
-                WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
-                ORDER BY exchange_date DESC
-            """, (today_date, selected_currency, selected_currency, start_date, end_date))
+            if today_date > end_date:
+                cur.execute("""
+                                SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                                       exchange_rate_cad, exchange_rate_btc
+                                FROM currencies_history
+                                WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
+                                ORDER BY exchange_date DESC
+                            """, (selected_currency, start_date, end_date))
+            else:
+                cur.execute("""
+                                SELECT currency_code, %s as exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                                       exchange_rate_cad, exchange_rate_btc
+                                FROM currencies
+                                WHERE currency_code = %s
+                                UNION
+                                SELECT currency_code, exchange_date, exchange_rate_usd, exchange_rate_eur, exchange_rate_jpy,
+                                       exchange_rate_cad, exchange_rate_btc
+                                FROM currencies_history
+                                WHERE currency_code = %s AND exchange_date BETWEEN %s AND %s
+                                ORDER BY exchange_date DESC
+                            """, (today_date, selected_currency, selected_currency, start_date, end_date))
             data = cur.fetchall()
     finally:
         conn.close()
